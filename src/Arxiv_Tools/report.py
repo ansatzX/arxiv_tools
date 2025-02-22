@@ -26,14 +26,11 @@ def _gen_arxiv_markdown(arxiv_id, title, authors, abstract):
 
 Title:  {title_text}
 
-
 Authors:  {author_text}
 
-
 Abstract: 
-
-
-{abstract_text}
+> [!quote]- Abstract
+> {abstract_text}
 
 
 '''
