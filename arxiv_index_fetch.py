@@ -21,7 +21,7 @@ query_args = {'advanced': '',
                     'date-year': '',
                     'date-from_date': '2025-02-01',
                     'date-to_date': '2025-02-02',
-                    'date-date_type': 'submitted_date',
+                    'date-date_type': 'submitted_date_first', # first Submission 
                     'abstracts': 'show',
                     'size': '200',
                     'order': 'submitted_date'
@@ -68,7 +68,7 @@ def query_arxiv_dict(date_from_date='2025-02-01', date_to_date='2025-02-02', que
 
         abstract = aso.find(class_='abstract-full')
         abstract = abstract.text.strip() # with less
+        query_dict[arxiv_id] = [title, authors, abstract]
+        # tmp_res.append([arxiv_id, title, authors, abstract])
 
-        tmp_res.append([arxiv_id, title, authors, abstract])
-
-    return tmp_res
+    return query_dict
