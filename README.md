@@ -40,20 +40,32 @@ install and activate plugins : `MetaEdit` `Dataview`
 
 ## Core Features
 Intelligent Metadata Pipeline
+
+`arxiv_update.py`
 ```python 
+import time
 from ArXiv_Tools.report import filter_arxiv_to_md
 from ArXiv_Tools.arxiv_index_fetch import query_args
 
+# get time 
+localtime = time.localtime()
+year = localtime.tm_year
+month = localtime.tm_mon
 # Example: Generate quantum physics report for 2025-02
 filter_arxiv_to_md(
-    year=2025,
-    month=2,
+    year=year,
+    month=month,
     md_folder=r'/path/to/obsidian/vault/arxiv_datas/quant-ph',
     query_args=query_args  # Customize arXiv categories
 )
-# you may write a schedule job to update data everyday.
 ```
 
+you may write a schedule job to update data everyday.
+
+```crontab
+30 7 * * * python arxiv_update.py
+```
+It means that this command will be executed at 7:30 everyday/
 ## TO-DO
 
 1. update function and remind 

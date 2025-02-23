@@ -3,7 +3,7 @@ from setuptools import setup
 with open('requirements.txt', 'r') as f:
     req = f.read()
 setup(
-    name='Arxiv_Tools',
+    name='ArXiv_Tools',
     python_requires='>3.8.0',
     version='0.1.0',
     author='Cunxi Gong',
