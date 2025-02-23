@@ -1,7 +1,7 @@
 # arXiv Tools - Intelligent Literature Workflow Manager
 
 **Author:** Ansatz Gong  
-**Version:** 0.0.1 | Last Updated: 2025-02-23
+**Version:** 0.1.0 | Last Updated: 2025-02-23
 
 ## Background & Motivation
 
@@ -48,8 +48,8 @@ from ArXiv_Tools.arxiv_index_fetch import query_args
 filter_arxiv_to_md(
     year=2025,
     month=2,
-    output_path='/path/to/obsidian/vault/arxiv_datas/quant-ph',
-    query_params=query_args  # Customize arXiv categories
+    md_folder=r'/path/to/obsidian/vault/arxiv_datas/quant-ph',
+    query_args=query_args  # Customize arXiv categories
 )
 # you may write a schedule job to update data everyday.
 ```

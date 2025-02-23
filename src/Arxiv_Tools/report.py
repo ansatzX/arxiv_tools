@@ -93,5 +93,8 @@ def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=q
             os.makedirs(month_dir, exist_ok=True)
             date_string = f'{year}-{month:02}-{day:02}'
             markdown_str = _gen_oneday_markdown(date_string, arxiv_dict, Zot_)
-            with open(os.path.join(month_dir, f'{day:02}.md'), 'w') as f:
+            with open(
+                os.path.join(month_dir, f'{day:02}.md'), 
+                "w", encoding="utf-8"
+            ) as f:
                 f.write(markdown_str)
