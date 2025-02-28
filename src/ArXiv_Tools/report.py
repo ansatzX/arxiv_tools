@@ -1,7 +1,8 @@
 import os
 from .arxiv_index_fetch import query_arxiv_dict, query_args
 from .zotero_query import zotero_query
-
+from .codex import replace_characters
+import logging
 
 def _get_arxiv_doi(arxiv_id):
     arxiv_doi = arxiv_id.replace(':', '.')
@@ -19,8 +20,10 @@ def _gen_arxiv_markdown(arxiv_id, title, authors, abstract):
     title_text = title
     author_text = ''
     for author in authors:
-        author_text += author
+        author_text += f'{author}, '
     abstract_text = abstract
+    for key in replace_characters:
+        abstract_text = abstract_text.replace(key, replace_characters[key])
     arxiv_markdown = f'''
 ### {arxiv_id_text}
 
@@ -92,6 +95,7 @@ def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=q
             # date_dir = os.path.join(month_dir, f'{day:02}')
             os.makedirs(month_dir, exist_ok=True)
             date_string = f'{year}-{month:02}-{day:02}'
+            print(f'processing {date_from_date}')
             markdown_str = _gen_oneday_markdown(date_string, arxiv_dict, Zot_)
             with open(
                 os.path.join(month_dir, f'{day:02}.md'), 
