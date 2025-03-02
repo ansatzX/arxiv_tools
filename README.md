@@ -63,7 +63,7 @@ filter_arxiv_to_md(
 you may write a schedule job to update data everyday.
 
 ```crontab
-30 7 * * * python arxiv_update.py
+30 7 * * * conda run -n arxiv  arxiv_update.py
 ```
 It means that this command will be executed at 7:30 everyday/
 ## TO-DO
