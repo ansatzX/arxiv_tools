@@ -2,7 +2,10 @@ import os
 from .arxiv_index_fetch import query_arxiv_dict, query_args
 from .zotero_query import zotero_query
 from .codex import replace_characters
+from . import arxiv_logger
 import logging
+
+logger = arxiv_logger
 
 def _get_arxiv_doi(arxiv_id):
     arxiv_doi = arxiv_id.replace(':', '.')
@@ -16,7 +19,7 @@ def _get_arxiv_url(arxiv_id):
     return arxiv_url
 
 def _gen_arxiv_markdown(arxiv_id, title, authors, abstract):
-    arxiv_id_text = '[' + arxiv_id+ ']' + '(' + _get_arxiv_url(arxiv_id) + ')'
+    arxiv_link_text = '[' + arxiv_id+ ']' + '(' + _get_arxiv_url(arxiv_id) + ')'
     title_text = title
     author_text = ''
     for author in authors:
@@ -25,7 +28,9 @@ def _gen_arxiv_markdown(arxiv_id, title, authors, abstract):
     for key in replace_characters:
         abstract_text = abstract_text.replace(key, replace_characters[key])
     arxiv_markdown = f'''
-### {arxiv_id_text}
+### {arxiv_id}
+
+Links: {arxiv_link_text} 
 
 Title:  {title_text}
 
@@ -58,25 +63,59 @@ def _gen_data(arxiv_dict, Zot_):
     return collect_dict, not_collect_dict
 
 
-def _gen_oneday_markdown(date_string, oneday_arxiv_dict, Zot_):
-    collect_dict, not_collect_dict = _gen_data(oneday_arxiv_dict, Zot_)
+def _gen_oneday_markdown(date_string, oneday_arxiv_dict, Zot_, old_data=None):
+    collect_dict, not_collect_dict= _gen_data(oneday_arxiv_dict, Zot_)
 
     # date_string = '2025-02-01'
-
+    new_data = []
     date_markdown =f'# {date_string} preprint by arxiv_tools\n\n'
     date_markdown += '## collected\n\n'
     for key in sorted([key for key in collect_dict]):
         value = collect_dict[key]
         date_markdown += value
+        if old_data is not None:
+            if key not in old_data:
+                new_data.append(key)
 
     date_markdown += '## not collected\n\n'
 
     for key in sorted([key for key in not_collect_dict]):
         value = not_collect_dict[key]
         date_markdown += value
+        if old_data is not None:
+            if key not in old_data:
+                new_data.append(key)
+            
+    if new_data.__len__(): 
+        date_markdown += '## update \n\n'
 
+        for key in sorted([key for key in new_data]):
+            value = f'- [ ] [[#{key}]]\n'
+            date_markdown += value
+        
     return date_markdown
 
+def parse_old_report(file_path):
+    if os.path.exists(file_path):
+        
+        with open(
+                file_path, 
+                "r", encoding="utf-8"
+            ) as f:
+            lines = f.readlines()
+        old_title_lines = []
+        for line in lines:
+            if line.startswith('### arXiv:'):
+                arxiv_id_str = line[4:-1]
+                old_title_lines.append(arxiv_id_str)
+            if line.startswith('- [x]'):
+                arxiv_id_str = line[8:-2]
+                old_title_lines.append(arxiv_id_str)
+            
+        return old_title_lines
+    else:
+        return None
+        
 def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=query_args):
 
     Zot_ = zotero_query() # default local use
@@ -90,15 +129,20 @@ def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=q
         # print(date_from_date, date_to_date)
         arxiv_dict = query_arxiv_dict(date_from_date, date_to_date, query_args)
         if arxiv_dict.__len__():
+            logger.info(f'{arxiv_dict.__len__()}')
             year_dir = os.path.join(root_dir, f'{year}')
             month_dir = os.path.join(year_dir, f'{month:02}')
             # date_dir = os.path.join(month_dir, f'{day:02}')
             os.makedirs(month_dir, exist_ok=True)
             date_string = f'{year}-{month:02}-{day:02}'
-            print(f'processing {date_from_date}')
-            markdown_str = _gen_oneday_markdown(date_string, arxiv_dict, Zot_)
+            logger.info(f'processing {date_from_date}, total num: {arxiv_dict.__len__()}')
+            oneday_report_file = os.path.join(month_dir, f'{day:02}.md')
+            parse_old = parse_old_report(oneday_report_file)
+            # print(parse_old)
+            markdown_str = _gen_oneday_markdown(date_string, arxiv_dict, Zot_, parse_old)
+            # print(markdown_str)
             with open(
-                os.path.join(month_dir, f'{day:02}.md'), 
+                oneday_report_file, 
                 "w", encoding="utf-8"
             ) as f:
                 f.write(markdown_str)
