@@ -30,7 +30,7 @@ def _gen_arxiv_markdown(arxiv_id, title, authors, abstract):
     arxiv_markdown = f'''
 ### {arxiv_id}
 
-Links: {arxiv_link_text} 
+- [ ] Links: {arxiv_link_text} 
 
 Title:  {title_text}
 
@@ -64,11 +64,27 @@ def _gen_data(arxiv_dict, Zot_):
 
 
 def _gen_oneday_markdown(date_string, oneday_arxiv_dict, Zot_, old_data=None):
+
     collect_dict, not_collect_dict= _gen_data(oneday_arxiv_dict, Zot_)
 
-    # date_string = '2025-02-01'
     new_data = []
-    date_markdown =f'# {date_string} preprint by arxiv_tools\n\n'
+    date_markdown = f'# {date_string} preprint by arxiv_tools\n\n'
+    date_markdown +=  f'''
+---
+tags:
+  - #quant-ph-{date_string}
+---
+
+
+```dataview
+TASK
+from #quant-ph-{date_string}
+
+WHERE completed
+
+```
+
+'''
     date_markdown += '## collected\n\n'
     for key in sorted([key for key in collect_dict]):
         value = collect_dict[key]
@@ -106,10 +122,10 @@ def parse_old_report(file_path):
         old_title_lines = []
         for line in lines:
             if line.startswith('### arXiv:'):
-                arxiv_id_str = line[4:-1]
+                arxiv_id_str = line[4:-1].strip()
                 old_title_lines.append(arxiv_id_str)
             if line.startswith('- [x]'):
-                arxiv_id_str = line[8:-2]
+                arxiv_id_str = line[8:-2].strip()
                 old_title_lines.append(arxiv_id_str)
             
         return old_title_lines
