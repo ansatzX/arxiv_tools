@@ -30,7 +30,9 @@ def _gen_arxiv_markdown(arxiv_id, title, authors, abstract):
     arxiv_markdown = f'''
 ### {arxiv_id}
 
-- [ ] Links: {arxiv_link_text} 
+Links:
+
+- [ ] {arxiv_link_text} 
 
 Title:  {title_text}
 
