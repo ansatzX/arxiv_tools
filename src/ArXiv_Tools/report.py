@@ -47,15 +47,17 @@ Abstract:
     return arxiv_markdown
 
 
-def _gen_data(arxiv_dict, Zot_):
+def _gen_data(arxiv_dict, Zot_=None):
     collect_dict = {}
     not_collect_dict = {}
     # TO-DO
     # update_dict = {} 
     for _, (arxiv_id, (title, authors, abstract)) in enumerate(arxiv_dict.items()):
         arxiv_doi = _get_arxiv_doi(arxiv_id)
-
-        query_res = Zot_.query_('DOI', arxiv_doi)
+        try:
+            query_res = Zot_.query_('DOI', arxiv_doi)
+        except:
+            query_res = []
         if query_res.__len__() :
             last_ok = query_res
             collect_dict[arxiv_id] =  _gen_arxiv_markdown(arxiv_id, title, authors, abstract)
@@ -137,7 +139,10 @@ def parse_old_report(file_path):
 def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=query_args):
 
     Zot_ = zotero_query() # default local use
-    Zot_.get_everything()
+    try:
+        Zot_.get_everything()
+    except:
+        Zot = None
     root_dir = md_folder
     
     for i in range(31):
