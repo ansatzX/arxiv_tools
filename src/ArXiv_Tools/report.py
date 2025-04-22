@@ -138,11 +138,11 @@ def parse_old_report(file_path):
         
 def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=quant_ph):
 
-    Zot_ = zotero_query() # default local use
     try:
+        Zot_ = zotero_query() # default local use
         Zot_.get_everything()
     except:
-        Zot = None
+        Zot_ = None
     root_dir = md_folder
     
     for i in range(31):
