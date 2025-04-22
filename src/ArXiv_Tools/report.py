@@ -1,7 +1,7 @@
 import os
-from .arxiv_index_fetch import query_arxiv_dict, query_args
+from .arxiv_index_fetch import query_arxiv_dict
 from .zotero_query import zotero_query
-from .codex import replace_characters
+from .codex import replace_characters, quant_ph
 from . import arxiv_logger
 import logging
 
@@ -136,7 +136,7 @@ def parse_old_report(file_path):
     else:
         return None
         
-def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=query_args):
+def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=quant_ph):
 
     Zot_ = zotero_query() # default local use
     try:

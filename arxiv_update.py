@@ -4,7 +4,7 @@ import argparse
 import logging
 from ArXiv_Tools import arxiv_logger
 from ArXiv_Tools.report import filter_arxiv_to_md
-from ArXiv_Tools.arxiv_index_fetch import query_args
+from ArXiv_Tools.codex import query_args
 
 logger = arxiv_logger
 
@@ -21,9 +21,11 @@ if __name__ == '__main__':
     for time__ in time_.split(','):
         for cat_ in categroy.split(','):
             md_folder = os.path.join(arxiv_folder, cat_)
-            if cat_ == 'quant-ph':
-                query_args = query_args
-
+            try:
+                _query_args = query_args[cat_]
+            except:
+                logger.info(f'cat_: {cat_} not supported, create issue to remind author')
+                raise RuntimeError
             if time__ == '1949.10':
                 localtime = time.localtime()
                 year = int(localtime.tm_year)
@@ -38,5 +40,5 @@ if __name__ == '__main__':
                 year=year,
                 month=month,
                 md_folder=md_folder,
-                query_args=query_args  # Customize arXiv categories
+                query_args=_query_args  # Customize arXiv categories
             )
