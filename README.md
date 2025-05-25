@@ -44,8 +44,31 @@ Intelligent Metadata Pipeline
 
 you may write a schedule job to update data everyday.
 
+I recommand conda as python env mananger tool
+
+you can write a bash script
+
+```bash
+#!/bin/bash 
+source /home/ansatz/.bashrc
+
+# quant_ph
+#
+#
+export my_conda_bin=/home/ansatz/soft/miniconda3/bin/conda 
+
+cd /home/ansatz/data/code/arxiv_reading
+
+$my_conda_bin run -n arxiv python -u arxiv_update.py  --categroy chem-ph,quant-ph --arxiv_folder /home/ansatz/data/obsidian/1/arxiv_datas --time 2025.5
+```
 ```crontab
-30 7 * * * conda run -n arxiv  arxiv_update.py --categroy hep-ex --time 2024.2 --arxiv_folder /home/ansatz/data/obsidian/1/arxiv_datas
+30 7 * * * bash /home/ansatz/data/code/arxiv_reading/run.sh
+```
+
+or you can use python directly, if default python can work.
+ 
+```crontab
+30 7 * * * python arxiv_update.py --categroy hep-ex --time 2024.2 --arxiv_folder /home/ansatz/data/obsidian/1/arxiv_datas
 ```
 It means that this command will be executed at 7:30 everyday/
 ## TO-DO
