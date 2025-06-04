@@ -40,5 +40,6 @@ if __name__ == '__main__':
                 year=year,
                 month=month,
                 md_folder=md_folder,
-                query_args=_query_args  # Customize arXiv categories
+                query_args=_query_args,  # Customize arXiv categories
+                categroy=cat_
             )

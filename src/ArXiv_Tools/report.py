@@ -1,4 +1,5 @@
 import os
+from unicodedata import category
 from .arxiv_index_fetch import query_arxiv_dict
 from .zotero_query import zotero_query
 from .codex import replace_characters, quant_ph
@@ -70,19 +71,19 @@ def _gen_data(arxiv_dict, Zot_=None):
 def _gen_oneday_markdown(date_string, oneday_arxiv_dict, Zot_, old_data=None):
 
     collect_dict, not_collect_dict= _gen_data(oneday_arxiv_dict, Zot_)
-
+    category = oneday_arxiv_dict['category']
     new_data = []
     date_markdown = f'# {date_string} preprint by arxiv_tools\n\n'
     date_markdown +=  f'''
 ---
 tags:
-  - #quant-ph-{date_string}
+  - #{category}-{date_string}
 ---
 
 
 ```dataview
 TASK
-from #quant-ph-{date_string}
+from #{category}-{date_string}
 
 WHERE completed
 
@@ -136,7 +137,7 @@ def parse_old_report(file_path):
     else:
         return None
         
-def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=quant_ph):
+def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=quant_ph, categroy='quant-ph'):
 
     try:
         Zot_ = zotero_query() # default local use
@@ -151,6 +152,7 @@ def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=q
         date_to_date = f'{year}-{month:02}-{day+1:02}'
         # print(date_from_date, date_to_date)
         arxiv_dict = query_arxiv_dict(date_from_date, date_to_date, query_args)
+        arxiv_dict['categroy'] = categroy
         if arxiv_dict.__len__():
             logger.info(f'{arxiv_dict.__len__()}')
             year_dir = os.path.join(root_dir, f'{year}')
