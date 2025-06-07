@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from unicodedata import category
 from .arxiv_index_fetch import query_arxiv_dict
 from .zotero_query import zotero_query
@@ -70,8 +71,11 @@ def _gen_data(arxiv_dict, Zot_=None):
 
 def _gen_oneday_markdown(date_string, oneday_arxiv_dict, Zot_, old_data=None):
 
-    collect_dict, not_collect_dict= _gen_data(oneday_arxiv_dict, Zot_)
+    oneday_arxiv_dict = deepcopy(oneday_arxiv_dict)
     category = oneday_arxiv_dict['category']
+    del oneday_arxiv_dict['category']
+    collect_dict, not_collect_dict= _gen_data(oneday_arxiv_dict, Zot_)
+
     new_data = []
     date_markdown = f'# {date_string} preprint by arxiv_tools\n\n'
     date_markdown +=  f'''
@@ -137,7 +141,7 @@ def parse_old_report(file_path):
     else:
         return None
         
-def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=quant_ph, categroy='quant-ph'):
+def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=quant_ph, category='quant-ph'):
 
     try:
         Zot_ = zotero_query() # default local use
@@ -152,15 +156,16 @@ def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=q
         date_to_date = f'{year}-{month:02}-{day+1:02}'
         # print(date_from_date, date_to_date)
         arxiv_dict = query_arxiv_dict(date_from_date, date_to_date, query_args)
-        arxiv_dict['categroy'] = categroy
+        
         if arxiv_dict.__len__():
+            arxiv_dict['category'] = category
             logger.info(f'{arxiv_dict.__len__()}')
             year_dir = os.path.join(root_dir, f'{year}')
             month_dir = os.path.join(year_dir, f'{month:02}')
             # date_dir = os.path.join(month_dir, f'{day:02}')
             os.makedirs(month_dir, exist_ok=True)
             date_string = f'{year}-{month:02}-{day:02}'
-            logger.info(f'processing {date_from_date}, total num: {arxiv_dict.__len__()}')
+            logger.info(f'processing {date_from_date}, total num: {arxiv_dict.__len__()} -1 ')
             oneday_report_file = os.path.join(month_dir, f'{day:02}.md')
             parse_old = parse_old_report(oneday_report_file)
             # print(parse_old)
