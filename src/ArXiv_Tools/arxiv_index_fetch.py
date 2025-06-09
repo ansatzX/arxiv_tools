@@ -54,7 +54,18 @@ def query_arxiv_dict(date_from_date='2025-02-01', date_to_date='2025-02-02', que
 
         abstract = aso.find(class_='abstract-full')
         abstract = abstract.text.strip() # with less
-        query_dict[arxiv_id] = [title, authors, abstract]
+
+        tags = aso.find_all(class_='tag')
+        external_doi = ''
+        for tag in tags:
+            if tag.find(class_='fa fa-external-link'):
+                href_link = tag.find_next()['href']
+                external_doi = tag.text.strip()
+
+        if len(external_doi) > 0:
+            query_dict[arxiv_id] = [title, authors, abstract, (external_doi, href_link) ]
+        else:
+            query_dict[arxiv_id] = [title, authors, abstract, () ]
         # tmp_res.append([arxiv_id, title, authors, abstract])
 
     return query_dict

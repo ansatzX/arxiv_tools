@@ -54,7 +54,7 @@ def _gen_data(arxiv_dict, Zot_=None):
     not_collect_dict = {}
     # TO-DO
     # update_dict = {} 
-    for _, (arxiv_id, (title, authors, abstract)) in enumerate(arxiv_dict.items()):
+    for _, (arxiv_id, (title, authors, abstract, external_)) in enumerate(arxiv_dict.items()):
         arxiv_doi = _get_arxiv_doi(arxiv_id)
         try:
             query_res = Zot_.query_('DOI', arxiv_doi)
@@ -64,8 +64,19 @@ def _gen_data(arxiv_dict, Zot_=None):
             last_ok = query_res
             collect_dict[arxiv_id] =  _gen_arxiv_markdown(arxiv_id, title, authors, abstract)
         else:
-
-            not_collect_dict[arxiv_id] =  _gen_arxiv_markdown(arxiv_id, title, authors, abstract)
+            if external_.__len__() == 2:
+                external_doi = external_[0]
+                try:
+                    query_res = Zot_.query_('DOI', external_doi)
+                except:
+                    query_res = []
+                if query_res.__len__() :
+                    last_ok = query_res
+                    collect_dict[arxiv_id] =  _gen_arxiv_markdown(arxiv_id, title, authors, abstract)
+                else:
+                    not_collect_dict[arxiv_id] =  _gen_arxiv_markdown(arxiv_id, title, authors, abstract)
+            else:
+                not_collect_dict[arxiv_id] =  _gen_arxiv_markdown(arxiv_id, title, authors, abstract)
     return collect_dict, not_collect_dict
 
 
@@ -159,7 +170,7 @@ def filter_arxiv_to_md(year: int, month: int, md_folder: str, query_args: dict=q
         
         if arxiv_dict.__len__():
             arxiv_dict['category'] = category
-            logger.info(f'{arxiv_dict.__len__()}')
+            logger.info(f'{arxiv_dict.__len__() - 1}')
             year_dir = os.path.join(root_dir, f'{year}')
             month_dir = os.path.join(year_dir, f'{month:02}')
             # date_dir = os.path.join(month_dir, f'{day:02}')
